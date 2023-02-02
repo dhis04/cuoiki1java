@@ -6,26 +6,24 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
     
-    private static final String MYSQL_HOSTNAME = "localhost";
-    private static final String MYSQL_USERNAME = "root";
-    private static final String MYSQL_PASSWORD = " ";
+    private String MYSQL_HOSTNAME = "localhost";
+    private String MYSQL_USERNAME = "root";
+    private  String MYSQL_PASSWORD = " ";
 
    
-    private static final String MYSQL_DATABASE = "shopshoemanager";
+    private String MYSQL_DATABASE = "shopshoemanager";
 
-    private static Connection connection;
+    protected  Connection connection;
 
-    public static Connection getConnection() {
-        if (connection == null) {
-            try {
-               
-                Class.forName("com.mysql.jdbc.Driver");
-                String url = "jdbc:mysql://" + MYSQL_HOSTNAME + "/" + MYSQL_DATABASE + "?autoReconnect=true&useSSL=false";
-                connection = DriverManager.getConnection(url, MYSQL_USERNAME, MYSQL_PASSWORD);
-            } catch (SQLException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+    public DatabaseConnection()
+    {
+        try
+        {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            String url = "jdbc:mysql://" + MYSQL_HOSTNAME + "/" + MYSQL_DATABASE + "?autoReconnect=true&useSSL=false";
+            connection=DriverManager.getConnection(url, "root", "");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return connection;
     }
 }

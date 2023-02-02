@@ -68,7 +68,7 @@ public class Login extends JFrame
        if(n==true)
        {
           this.dispose();
-          Admin ad = new Admin("Admin");
+          Adminnew ad = new Adminnew("Admin");
           ad.showWh();
        }
        else

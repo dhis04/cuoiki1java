@@ -16,6 +16,10 @@ public class Booth
     public void setNameBooth(String nameBooth) {
         this.nameBooth = nameBooth;
     }
+    @Override
+    public String toString() {
+        return  this.nameBooth ;
+    }
     
 
 }

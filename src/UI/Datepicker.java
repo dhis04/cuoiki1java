@@ -85,7 +85,7 @@ public class Datepicker extends JFrame
                 Calendar selectedDate = calendar.getCalendar();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 setDate(dateFormat.format(selectedDate.getTime()));
-                ad.setTextFieldText();
+               // ad.setTextFieldText();
                 //ad.setTextdate(getDate());
                 //ad.setTextFieldText(getDate());
                 //ad.setTextFieldText(getDate());

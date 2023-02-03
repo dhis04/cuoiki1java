@@ -10,6 +10,24 @@ import Model.Booth;
 
 public class ListBoothDatabase extends DatabaseConnection
 {
+    public int Savenew(Booth booth)
+    {
+        try
+        {
+            String sql = "insert into booth values(?,?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, booth.getIdBooth());
+            preparedStatement.setString(2, booth.getNameBooth());
+            // trả về giá trị số lần insert thành công
+            return preparedStatement.executeUpdate();
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        return -1;
+    }
     public ArrayList<Booth>selectList()
     {
 

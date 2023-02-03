@@ -1,6 +1,5 @@
 package RUNUI;
 
-import UI.Admin;
 import UI.Adminnew;
 
 public class testAdmin 

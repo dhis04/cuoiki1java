@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -21,10 +22,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+
 import com.toedter.calendar.JCalendar;
 
 import Model.Booth;
+import Model.Items;
+import SQL.ItemsData;
 import SQL.ListBoothDatabase;
+import TryCatch.NumEx;
+import TryCatch.PriceEx;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -37,6 +43,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Vector;
 
 
 public class Adminnew  extends JFrame
@@ -58,12 +65,20 @@ public class Adminnew  extends JFrame
 
         ListBoothDatabase datalist ;
         ArrayList<Booth> boothList;
+        Booth selectBooth;
+
+        ItemsData dataItems;
+        ArrayList<Items> itemsList;
+        Items selectedItem;
+       
+
     public Adminnew(String s) 
     {
         super(s);
         addControl();
         addEvent();
         showListBooth();
+
     }
     public String getDate() {
         return date;
@@ -226,12 +241,7 @@ public class Adminnew  extends JFrame
         btAdd.setIcon(new ImageIcon("D:\\CuoiKiI\\CuoiKi\\src\\Icon\\file.png"));
         btAdd.setBackground(make);
         panelButton.add(btAdd);
-        
-        
-        btSave = new JButton("Save");
-        btSave.setIcon(new ImageIcon("D:\\CuoiKiI\\CuoiKi\\src\\Icon\\save.png"));
-        btSave.setBackground(make);
-        panelButton.add( btSave);
+
 
         btDelete = new JButton("Delete");
         btDelete.setIcon(new ImageIcon("D:\\CuoiKiI\\CuoiKi\\src\\Icon\\delete.png"));
@@ -282,7 +292,50 @@ public class Adminnew  extends JFrame
         popup.add(menuDelete);
     }
     public void addEvent() {
-        
+        btUp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UpdateEvent();
+            }
+        });
+        btSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LookForUI lk = new LookForUI("Look For Items");
+                lk.showWh();
+            }
+        });
+        btAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!PriceEx.PriceInteger(txtPrice)||!PriceEx.PriceInteger(txtSize)||!PriceEx.PriceInteger(txtNum))
+                {
+                    JOptionPane.showMessageDialog(null, " Price,Size and Number of item  is an integer type please re-enter.", "Error", JOptionPane.ERROR_MESSAGE);
+                    txtPrice.setText("");
+                    txtNum.setText("");
+                    txtSize.setText("");
+                }
+               else
+                {
+                    addItemsEvent();
+                }
+            }
+        });
+        btDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteEvent();
+            }
+        });
+        menuNew.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AddBooth adbt= new AddBooth("Add new booth");
+                adbt.showWh();
+                showListBooth();
+                ListBooth.updateUI();
+            }
+        });
        btLogOut.addActionListener(new ActionListener() {
              @Override
              public void actionPerformed(ActionEvent e) {
@@ -306,6 +359,15 @@ public class Adminnew  extends JFrame
              @Override
              public void mouseClicked(MouseEvent e) {
  
+                DefaultMutableTreeNode nodeSelect = (DefaultMutableTreeNode) ListBooth.getLastSelectedPathComponent();
+                if(nodeSelect==null) return;
+                if(dataItems==null)
+                dataItems=new ItemsData();
+                selectBooth = (Booth) nodeSelect.getUserObject();
+                if(selectBooth!=null) 
+                itemsList= dataItems.selectItems(selectBooth.getIdBooth());
+                showListItems();
+
              }
  
              @Override
@@ -334,7 +396,58 @@ public class Adminnew  extends JFrame
              }
          });
  
+
+         itemsJTable.addMouseListener(new MouseListener() {
+             @Override
+             public void mouseClicked(MouseEvent e) {
+                 int row = itemsJTable.getSelectedRow();
+                 if(row ==-1) return ;
+                 selectedItem = itemsList.get(row);
+                 txtID.setText(selectedItem.getIdItems());
+                 txtName.setText(selectedItem.getNameItems());
+                 txtNum.setText(Integer.toString(selectedItem.getNumberOfItems()));
+                 txtSize.setText(Integer.toString(selectedItem.getSize()));
+                 txtPrice.setText(Integer.toString(selectedItem.getPriceofItems()));
+                 txtImport.setText(selectedItem.getImportDateItems());
+             }
+
+             @Override
+             public void mousePressed(MouseEvent e) {
+
+             }
+
+             @Override
+             public void mouseReleased(MouseEvent e) {
+
+             }
+
+             @Override
+             public void mouseEntered(MouseEvent e) {
+
+             }
+
+             @Override
+             public void mouseExited(MouseEvent e) {
+
+             }
+         });
      }
+     public void showListItems()
+     {
+        dtmListItems.setRowCount(0);
+        for(Items item : itemsList)
+        {
+            Vector<Object> vec = new Vector<Object>();
+            vec.add(item.getIdItems());
+            vec.add(item.getNameItems());
+            vec.add(item.getNumberOfItems());
+            vec.add(item.getSize());
+            vec.add(item.getPriceofItems());
+            vec.add(item.getImportDateItems());
+            dtmListItems.addRow(vec);
+        }
+     }
+
      public void showListBooth()
      {
        if(datalist==null)
@@ -348,6 +461,112 @@ public class Adminnew  extends JFrame
        }
        ListBooth.expandRow(0);
 
+
+     }
+     public void deleteEvent()
+     {
+         if(selectedItem==null) return;
+         int op = JOptionPane.showConfirmDialog(null,"Do you want to detele this items?","Delete",JOptionPane.YES_NO_OPTION);
+         if(op==JOptionPane.YES_OPTION)
+         {
+             txtID.setText(null);
+             txtImport.setText(null);
+             txtName.setText(null);
+             txtNum.setText(null);
+             txtPrice.setText(null);
+             txtSize.setText(null);
+             if(dataItems==null)
+                 dataItems=new ItemsData();
+             if(dataItems.deleteItems(selectedItem)>0)
+             {
+                 if(selectBooth!=null) itemsList= dataItems.selectItems(selectBooth.getIdBooth());
+                 showListItems();
+             }
+         }
+     }
+     public void  addItemsEvent()
+     {
+
+         try
+         {
+             Items items = new Items();
+             items.setIdItems(txtID.getText());
+             items.setNameItems(txtName.getText());
+             items.setNumberOfItems(Integer.parseInt(txtNum.getText()));
+             items.setSize(Integer.parseInt(txtSize.getText()));
+             items.setPriceofItems(Integer.parseInt(txtPrice.getText()));
+             items.setImportDateItems(txtImport.getText());
+             items.setIdBooth(selectBooth.getIdBooth());
+             ItemsData itdata = new ItemsData();
+             int x= itdata.insertItems(items);
+                 int op = JOptionPane.showConfirmDialog(null
+                         ,"Do you want to insert this items?"
+                         ,"Insert Items",JOptionPane.OK_OPTION);
+                 if(op==JOptionPane.OK_OPTION)
+                 {
+                     txtID.setText(null);
+                     txtImport.setText(null);
+                     txtName.setText(null);
+                     txtNum.setText(null);
+                     txtPrice.setText(null);
+                     txtSize.setText(null);
+                     if(dataItems==null)
+                         dataItems=new ItemsData();
+                     if(x>0)
+                     {
+                         if(selectBooth!=null)
+                             itemsList= dataItems.selectItems(selectBooth.getIdBooth());
+                         showListItems();
+                     }
+
+                 }
+
+
+
+         }
+         catch(Exception e)
+         {
+             e.printStackTrace();
+         }
+     }
+     public void UpdateEvent()
+     {
+
+        try
+         {
+            
+             ItemsData itdata = new ItemsData();
+             int x= itdata.UpdateItems(txtID.getText(),txtName.getText(),txtNum.getText(),txtSize.getText(),txtPrice.getText(),txtImport.getText(),selectBooth.getIdBooth());
+             
+                 int op = JOptionPane.showConfirmDialog(null
+                         ,"Do you want to update this items?"
+                         ,"Update Items",JOptionPane.OK_OPTION);
+                 if(op==JOptionPane.OK_OPTION)
+                 {
+                     txtID.setText(null);
+                     txtImport.setText(null);
+                     txtName.setText(null);
+                     txtNum.setText(null);
+                     txtPrice.setText(null);
+                     txtSize.setText(null);
+                     if(dataItems==null)
+                         dataItems=new ItemsData();
+                     if(x>0)
+                     {
+                         if(selectBooth!=null)
+                             itemsList= dataItems.selectItems(selectBooth.getIdBooth());
+                         showListItems();
+                     }
+
+                 }
+
+
+
+         }
+         catch(Exception e)
+         {
+             e.printStackTrace();
+         }
 
      }
 }

@@ -13,7 +13,7 @@ public class LoginCheck
           Class.forName("com.mysql.cj.jdbc.Driver");
     
           Connection conn = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/shopshoemanager", "root", "");
+          "jdbc:mysql://localhost:3306/shopshoemanager", "root", "");
     
           String sql = "SELECT COUNT(*) FROM login WHERE user = ? AND password = ?";
           PreparedStatement stmt = conn.prepareStatement(sql);

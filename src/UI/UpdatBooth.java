@@ -1,26 +1,24 @@
 package UI;
 
 import Model.Booth;
-import Model.Items;
+import SQL.ItemsData;
 import SQL.ListBoothDatabase;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
-
-public class AddBooth extends JDialog
+public class UpdatBooth extends JDialog
 {
-
     JButton btSave , btExit;
     JTextField txtId, txtName;
-    public AddBooth(String s)
+    public UpdatBooth(String s)
     {
         this.setTitle(s);
         addcontrol();
         addEvent();
+
     }
     public void showWh()
     {
@@ -29,7 +27,7 @@ public class AddBooth extends JDialog
         this.setLocationRelativeTo(null);
         this.setModal(true);
         this.setVisible(true);
-        
+
     }
     public void addcontrol()
     {
@@ -39,7 +37,7 @@ public class AddBooth extends JDialog
         panelMain.setLayout(new BoxLayout(panelMain,BoxLayout.Y_AXIS));
 
         JPanel panelTitel = new JPanel();
-        JLabel lbTitel = new JLabel("  ADD NEW BOOTH");
+        JLabel lbTitel = new JLabel("  UPDATE BOOTH");
         panelTitel.add(lbTitel);
         panelMain.add(panelTitel);
 
@@ -76,45 +74,48 @@ public class AddBooth extends JDialog
     }
     public void addEvent()
     {
-     btExit.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-             dispose();
-         }
-     });
-     btSave.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-             EventSave();
-         }
-     });
+       btExit.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               dispose();
+           }
+       });
+        btSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EventSave();
+            }
+        });
     }
     public void EventSave()
     {
-     ListBoothDatabase listBoothDatabase = new ListBoothDatabase();
-     if(listBoothDatabase.checkIDExists(txtId.getText())==true)
-     {
-         JOptionPane.showMessageDialog(null,"It's have ID: "+txtId.getText()+" You can't add items");
+        ListBoothDatabase listBoothDatabase=new ListBoothDatabase();
+        if(listBoothDatabase.checkIDExists(txtId.getText())==true)
+        {
+            try
+            {
 
-     }
-     else
-     {
-         try
-         {
+                Booth booth = new Booth();
+                booth.setIdBooth(txtId.getText());
+                booth.setNameBooth(txtName.getText());
+               // ListBoothDatabase listBoothDatabase = new ListBoothDatabase();
+                int x = listBoothDatabase.UpdateBooth(txtId.getText(),txtName.getText());
+                if(x>0)
+                {
+                    JOptionPane.showMessageDialog(null,"Update successful ");
+                }
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(null,"Don't have ID: "+txtId.getText());
+            txtId.setText("");
+            txtName.setText("");
+        }
 
-             Booth booth = new Booth();
-             booth.setIdBooth(txtId.getText());
-             booth.setNameBooth(txtName.getText());
-             int x = listBoothDatabase.Savenew(booth);
-             if(x>0)
-             {
-                 JOptionPane.showMessageDialog(null,"Add successful ");
-             }
-         }
-         catch(Exception e)
-         {
-             e.printStackTrace();
-         }
-     }
     }
 }

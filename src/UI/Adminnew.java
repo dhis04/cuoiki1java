@@ -1,35 +1,22 @@
 package UI;
 
+import javax.swing.*;
 import javax.swing.JFrame;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-
+import com.itextpdf.text.Document;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.mysql.cj.xdevapi.Table;
 import com.toedter.calendar.JCalendar;
 
 import Model.Booth;
 import Model.Items;
 import SQL.ItemsData;
 import SQL.ListBoothDatabase;
-import TryCatch.NumEx;
 import TryCatch.PriceEx;
 
 import java.awt.*;
@@ -39,11 +26,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Vector;
+import java.util.*;
+
+
 
 
 public class Adminnew  extends JFrame
@@ -292,10 +283,38 @@ public class Adminnew  extends JFrame
         popup.add(menuDelete);
     }
     public void addEvent() {
+        btExcel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setDialogTitle("Save as");
+                chooser.setSelectedFile(new File("Data.xlsx"));
+                int option = chooser.showSaveDialog(Adminnew.this);
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    exportToExcel(itemsJTable, chooser.getSelectedFile());
+                }
+
+            }
+        });
+        btArr.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectBooth=null;
+                ArragEvent();
+            }
+        });
+        btSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArragEvent();
+            }
+        });
         btUp.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 UpdateEvent();
+                showListBooth();
+                ListBooth.updateUI();
             }
         });
         btSearch.addActionListener(new ActionListener() {
@@ -327,11 +346,30 @@ public class Adminnew  extends JFrame
                 deleteEvent();
             }
         });
+        menuDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+              
+                DeleteBooth deleteBooth = new DeleteBooth("Delete Booth");
+                deleteBooth.showWh();
+                showListBooth();
+                ListBooth.updateUI();
+            }
+        });
         menuNew.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AddBooth adbt= new AddBooth("Add new booth");
                 adbt.showWh();
+                showListBooth();
+                ListBooth.updateUI();
+            }
+        });
+        menuEdit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UpdatBooth up = new UpdatBooth("Update booth");
+                up.showWh();
                 showListBooth();
                 ListBooth.updateUI();
             }
@@ -359,7 +397,8 @@ public class Adminnew  extends JFrame
              @Override
              public void mouseClicked(MouseEvent e) {
  
-                DefaultMutableTreeNode nodeSelect = (DefaultMutableTreeNode) ListBooth.getLastSelectedPathComponent();
+                DefaultMutableTreeNode nodeSelect
+                 = (DefaultMutableTreeNode) ListBooth.getLastSelectedPathComponent();
                 if(nodeSelect==null) return;
                 if(dataItems==null)
                 dataItems=new ItemsData();
@@ -448,6 +487,7 @@ public class Adminnew  extends JFrame
         }
      }
 
+    
      public void showListBooth()
      {
        if(datalist==null)
@@ -462,6 +502,18 @@ public class Adminnew  extends JFrame
        ListBooth.expandRow(0);
 
 
+     }
+     public void ArragEvent()
+     {
+         ItemsData itemsData = new ItemsData();
+         ArrayList<Items> itemslistsort = itemsData.Arrage();
+         Collections.sort(itemslistsort, (o1, o2) -> Integer.compare(o1.getPriceofItems(), o2.getPriceofItems()));
+         for(Items item :itemslistsort)
+         {
+             dtmListItems.addRow(new Object[]{item.getIdItems(),item.getNameItems(),item.getNumberOfItems(),item.getSize(),item.getPriceofItems(),item.getImportDateItems()});
+         }
+         itemsJTable.setModel(dtmListItems);
+         itemsJTable.repaint();
      }
      public void deleteEvent()
      {
@@ -487,18 +539,26 @@ public class Adminnew  extends JFrame
      public void  addItemsEvent()
      {
 
-         try
+         ItemsData itemsData = new ItemsData();
+         if(itemsData.checkIDExists(txtID.getText())==true)
          {
-             Items items = new Items();
-             items.setIdItems(txtID.getText());
-             items.setNameItems(txtName.getText());
-             items.setNumberOfItems(Integer.parseInt(txtNum.getText()));
-             items.setSize(Integer.parseInt(txtSize.getText()));
-             items.setPriceofItems(Integer.parseInt(txtPrice.getText()));
-             items.setImportDateItems(txtImport.getText());
-             items.setIdBooth(selectBooth.getIdBooth());
-             ItemsData itdata = new ItemsData();
-             int x= itdata.insertItems(items);
+             JOptionPane.showMessageDialog(null,"It's have ID: "+txtID.getText()+" You can't add items");
+
+         }
+         else
+         {
+             try
+             {
+                 Items items = new Items();
+                 items.setIdItems(txtID.getText());
+                 items.setNameItems(txtName.getText());
+                 items.setNumberOfItems(Integer.parseInt(txtNum.getText()));
+                 items.setSize(Integer.parseInt(txtSize.getText()));
+                 items.setPriceofItems(Integer.parseInt(txtPrice.getText()));
+                 items.setImportDateItems(txtImport.getText());
+                 items.setIdBooth(selectBooth.getIdBooth());
+                 ItemsData itdata = new ItemsData();
+                 int x= itdata.insertItems(items);
                  int op = JOptionPane.showConfirmDialog(null
                          ,"Do you want to insert this items?"
                          ,"Insert Items",JOptionPane.OK_OPTION);
@@ -523,36 +583,49 @@ public class Adminnew  extends JFrame
 
 
 
-         }
-         catch(Exception e)
-         {
-             e.printStackTrace();
+             }
+             catch(Exception e)
+             {
+                 e.printStackTrace();
+             }
          }
      }
      public void UpdateEvent()
      {
-
-        try
+         ItemsData itemsData=new ItemsData();
+         if(itemsData.checkIDExists(txtID.getText())==true)
          {
-            
-             ItemsData itdata = new ItemsData();
-             int x= itdata.UpdateItems(txtID.getText(),txtName.getText(),txtNum.getText(),txtSize.getText(),txtPrice.getText(),txtImport.getText(),selectBooth.getIdBooth());
-             
+             try
+             {
+                 Items items = new Items();
+                 items.setIdItems(txtID.getText());
+                 items.setNameItems(txtName.getText());
+                 items.setNumberOfItems(Integer.parseInt(txtNum.getText()));
+                 items.setSize(Integer.parseInt(txtSize.getText()));
+                 items.setPriceofItems(Integer.parseInt(txtPrice.getText()));
+                 items.setImportDateItems(txtImport.getText());
+                 items.setIdBooth(selectBooth.getIdBooth());
+
+                 ItemsData itdata = new ItemsData();
+                 int x= itdata.updateItem(items.getIdItems(),items.getNameItems(),items.getNumberOfItems(),items.getSize(),items.getPriceofItems(),items.getImportDateItems(),items.getIdBooth());
+
                  int op = JOptionPane.showConfirmDialog(null
                          ,"Do you want to update this items?"
                          ,"Update Items",JOptionPane.OK_OPTION);
                  if(op==JOptionPane.OK_OPTION)
                  {
-                     txtID.setText(null);
-                     txtImport.setText(null);
-                     txtName.setText(null);
-                     txtNum.setText(null);
-                     txtPrice.setText(null);
-                     txtSize.setText(null);
+
                      if(dataItems==null)
                          dataItems=new ItemsData();
                      if(x>0)
                      {
+                         txtID.setText(null);
+                         txtImport.setText(null);
+                         txtName.setText(null);
+                         txtNum.setText(null);
+                         txtPrice.setText(null);
+                         txtSize.setText(null);
+                         System.out.println("Update successful");
                          if(selectBooth!=null)
                              itemsList= dataItems.selectItems(selectBooth.getIdBooth());
                          showListItems();
@@ -562,11 +635,40 @@ public class Adminnew  extends JFrame
 
 
 
-         }
-         catch(Exception e)
-         {
-             e.printStackTrace();
-         }
+             }
+             catch(Exception e)
+             {
+                 e.printStackTrace();
+             }
 
+         }
+         else
+         {
+             JOptionPane.showMessageDialog(null
+                     ,"Don't have ID: " + txtID.getText());
+         }
      }
+    public void exportToExcel(JTable table, File file) {
+        try {
+            TableModel model = table.getModel();
+            FileWriter excel = new FileWriter(file);
+
+            for (int i = 0; i < model.getColumnCount(); i++) {
+                excel.write(model.getColumnName(i) + "\t");
+            }
+
+            excel.write("\n");
+
+            for (int i = 0; i < model.getRowCount(); i++) {
+                for (int j = 0; j < model.getColumnCount(); j++) {
+                    excel.write(model.getValueAt(i, j).toString() + "\t");
+                }
+                excel.write("\n");
+            }
+
+            excel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

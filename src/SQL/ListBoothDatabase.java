@@ -4,12 +4,69 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
+import Model.Items;
 import com.mysql.cj.xdevapi.PreparableStatement;
 
 import Model.Booth;
 
 public class ListBoothDatabase extends DatabaseConnection
 {
+    public int UpdateBooth(String id,String name)
+    {
+        try
+        {
+            Booth booth = new Booth();
+            String sql="UPDATE `booth` SET `Namebooth` = ? WHERE `booth`.`IDbooth` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,name);
+            preparedStatement.setString(2, id);
+            return preparedStatement.executeUpdate();
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public  boolean checkIDExists(String id) {
+
+        PreparedStatement preparableStatement = null;
+        ResultSet resultSet = null;
+        try
+        {   String sql = "select * from booth where IDbooth=?";
+            preparableStatement = connection.prepareStatement(sql);
+            preparableStatement.setString(1, id);
+            resultSet = preparableStatement.executeQuery();
+            if(resultSet.next())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return  false;
+        }
+    }
+    public int deleteooth(String idBooth)
+    {
+        try
+        {
+            String sql = "delete from booth where IDbooth=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,idBooth);
+            return preparedStatement.executeUpdate();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return -1;
+    }
     public int Savenew(Booth booth)
     {
         try

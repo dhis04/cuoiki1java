@@ -13,14 +13,14 @@ public class DatabaseConnection {
    
     private String MYSQL_DATABASE = "shopshoemanager";
 
-    protected  Connection connection;
+    public   Connection connection;
 
     public DatabaseConnection()
     {
         try
         {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://" + MYSQL_HOSTNAME + "/" + MYSQL_DATABASE + "?autoReconnect=true&useSSL=false";
+            String url = "jdbc:mysql://" + MYSQL_HOSTNAME + "/" + MYSQL_DATABASE;
             connection=DriverManager.getConnection(url, "root", "");
         } catch (Exception e) {
             e.printStackTrace();

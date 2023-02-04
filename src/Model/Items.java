@@ -5,6 +5,22 @@ import java.sql.Date;
 public class Items 
 {
     public Items(){}
+
+   
+
+    public Items(String idItems, String nameItems, int numberOfItems, int size, int priceofItems,
+            String importDateItems, String idBooth) {
+        this.idItems = idItems;
+        this.nameItems = nameItems;
+        this.numberOfItems = numberOfItems;
+        Size = size;
+        this.priceofItems = priceofItems;
+        this.importDateItems = importDateItems;
+        this.idBooth = idBooth;
+    }
+
+
+
     private String idItems;
     private String nameItems;
     private int numberOfItems;

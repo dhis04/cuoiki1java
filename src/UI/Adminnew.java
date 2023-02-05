@@ -41,7 +41,7 @@ public class Adminnew  extends JFrame
 {
         JTextField txtID, txtName, txtNum, txtPrice, txtImport, txtSize;
 
-        JButton btAdd, btSave, btDelete, btArr, btLogOut, btUp, btSearch,btExcel;
+        JButton btAdd, btChart, btDelete, btArr, btLogOut, btUp, btSearch,btExcel;
         JMenuItem menuNew, menuEdit, menuDelete;
         JPopupMenu popup;
         JButton chosedate;
@@ -260,6 +260,12 @@ public class Adminnew  extends JFrame
         btExcel.setBackground(make);
         panelButton.add(btExcel);
 
+
+        btChart = new JButton("Chart");
+        btChart.setIcon(new ImageIcon("D:\\CuoiKiI\\CuoiKi\\src\\Icon\\chart.png"));
+        btChart.setBackground(make);
+        panelButton.add(btChart);
+
         btLogOut = new JButton("Log Out");
         btLogOut.setIcon(new ImageIcon("D:\\CuoiKiI\\CuoiKi\\src\\Icon\\logout.png"));
         btLogOut.setBackground(make);
@@ -283,6 +289,13 @@ public class Adminnew  extends JFrame
         popup.add(menuDelete);
     }
     public void addEvent() {
+        btChart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Chart chart = new Chart();
+                chart.displayChart(itemsJTable);
+            }
+        });
         btExcel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -54,7 +54,9 @@ public class Login extends JFrame
            @Override
            public void actionPerformed(ActionEvent e)
            {
-              System.exit(0);
+             dispose();
+              LoginorCreate loginorCreate = new LoginorCreate("Welcome");
+              loginorCreate.showWh();
            }
        });
        

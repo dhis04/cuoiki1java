@@ -1,11 +1,14 @@
 package RUNUI;
 
 import UI.Login;
+import UI.LoginorCreate;
 
 public class Loginrun {
     public static void main(String[] args) {
-       Login log = new Login("Log In");
-       log.showWh();
+      LoginorCreate lg = new LoginorCreate("Welcome");
+      lg.showWh();
+        
     }
+
     
 }

@@ -299,13 +299,8 @@ public class Adminnew  extends JFrame
         btArr.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectBooth=null;
-                ArragEvent();
-            }
-        });
-        btSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+                DefaultTableModel model = (DefaultTableModel) itemsJTable.getModel();
+                model.setRowCount(0);
                 ArragEvent();
             }
         });
@@ -377,7 +372,7 @@ public class Adminnew  extends JFrame
        btLogOut.addActionListener(new ActionListener() {
              @Override
              public void actionPerformed(ActionEvent e) {
-                 Login lg = new Login("Login");
+                 LoginorCreate lg = new LoginorCreate("Welcome ");
                  dispose();
                  lg.showWh();
              }

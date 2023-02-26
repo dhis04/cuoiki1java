@@ -8,6 +8,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -32,6 +34,24 @@ public class LookForUI extends JFrame
             @Override
             public void actionPerformed(ActionEvent e) {
                 showLook();
+            }
+        });
+        txtsearch.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                showLook();
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
             }
         });
     }

@@ -24,17 +24,17 @@ public class Chart extends JFrame
         int rowCount = model.getRowCount();
         double[] data = new double[rowCount];
         for (int i = 0; i < rowCount; i++) {
-            data[i] = Double.parseDouble(model.getValueAt(i, 3).toString());
+            data[i] = Double.parseDouble(model.getValueAt(i, 4).toString());
         }
         
         // Tạo biểu đồ
-        JFreeChart chart = ChartFactory.createBarChart("Size Chart", "Item", "Size", createDataset(data), PlotOrientation.VERTICAL, true, true, false);
+        JFreeChart chart = ChartFactory.createBarChart("Price Chart", "Item", "Price", createDataset(data), PlotOrientation.VERTICAL, true, true, false);
         CategoryPlot plot = chart.getCategoryPlot();
         plot.setRangeGridlinePaint(Color.BLACK);
         
         // Tạo giao diện hiển thị biểu đồ
         ChartPanel panel = new ChartPanel(chart);
-        JFrame frame = new JFrame("Size Chart");
+        JFrame frame = new JFrame("Price Chart");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.add(panel, BorderLayout.CENTER);
         frame.pack();
